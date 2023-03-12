@@ -1,0 +1,133 @@
+---
+title: "R Assignment"
+author: Jeniffer Perea-Lopez
+output: html_notebook
+date: 03-13-2023
+---
+
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+
+Part I
+
+Data Inspection
+
+1. fang_et_al_genotypes.txt
+
+```{r}
+#read a text file, named "fang_et_al_genotypes.txt"
+fang_et_al <- read.delim(file="fang_et_al_genotypes.txt", sep="\t", header=TRUE)
+#Analyze structure and dimensions of file
+ncol(fang_et_al)
+##number of columns: 986
+nrow(fang_et_al)
+##number of rows: 2782
+file.size("fang_et_al_genotypes.txt")
+##file size: 11051939 bytes
+```
+
+2. snp_position.txt
+
+```{r}
+#read a text file, named snp_position.txt
+snp_position <- read.delim(file="snp_position.txt", sep="\t",header= TRUE)
+#Analyze structure and dimensions of file
+ncol(snp_position)
+##number of columns: 15
+nrow(snp_position)
+##number of rows: 983
+file.size("snp_position.txt")
+##file size: 82763 bytes
+```
+
+Data Processing
+
+```{r}
+#Subsetting maize data (Group = ZMMIL, ZMMLR and ZMMMR)
+maize <- filter(fang_et_al, Group %in% c("ZMMIL","ZMMLR","ZMMMR"))
+#Remove extraneous information from maize, which includes columns 1-3
+maize <- maize[-c(1:3)]
+#Transpose maize file
+maize_transposed <- t(maize)
+
+#Subsetting teosinte data (Group = ZMPBA, ZMPIL and ZMPJA)
+teosinte <- filter(fang_et_al, Group %in% c("ZMPBA","ZMPIL","ZMPJA"))
+#Remove extraneous information from teosinte, which includes columns 1-3
+teosinte <- teosinte[-c(1:3)]
+#Transpose teosinte file 
+teosinte_transposed <- t(teosinte)
+
+#Remove extraenous information from snp_position, which includes columns 2 and 5-15, keeping only "SNP_ID," "Chromosome" and "Position"
+snp_position <- snp_position[c(1,3,4)]
+
+#Merge transposed files with snp_position 
+maize_snp <-  merge(snp_position,maize_transposed,by.x="SNP_ID", by.y="row.names")
+teosinte_snp <-  merge(snp_position,teosinte_transposed,by.x = "SNP_ID",by.y = "row.names")
+
+#FOR MAIZE: Sort data for each chromosome with SNPs ordered based on increasing position values and with missing data encoded by this symbol: ?
+
+dir.create("maize")
+
+for (i in 1:10){
+  ##filter Chromosome "i" data in maize_snp based on the "Chromosome" column
+  maize_chr <- filter(maize_snp,Chromosome %in% c(i))
+  ##Sort generated files based on the "Position" column in increasing order
+  maize_chr_increasing <- maize_chr[order(maize_chr$Position),]
+  ##Create corresponding files based on increasing position and Chromosome "i"
+  maize_increasing <- paste("maize/maize_increasing_chr",i,".txt", sep="")
+  ##Export data frame to files corresponding to each Chromosome "i" and based on increasing position values
+  write.table(maize_chr_increasing,file= maize_increasing, row.names = FALSE, sep = "\t")
+  
+#Sort data for each chromosome with SNPs ordered based on decreasing position values and with missing data encoded by this symbol: -
+  
+  ##Sort maize_chr files based on the "Position" column in decreasing order
+  maize_chr_decreasing <- maize_chr[order(maize_chr$Position, decreasing = TRUE),]
+  ##Replace "?" with "-"
+  maize_chr_decreasing[maize_chr_decreasing=="?/?"] <- "-/-"
+  ##Create corresponding files based on decreasing position and Chromosome "i"
+  maize_decreasing <- paste("maize/maize_decreasing_chr",i,".txt", sep="")
+  ##Export data frame to files corresponding to each Chromosome "i" and based on decreasing position values
+  write.table(maize_chr_decreasing,file= maize_decreasing, row.names = FALSE, sep = "\t")
+}
+
+#FOR TEOSINTE: Sort data for each chromosome with SNPs ordered based on increasing position values and with missing data encoded by this symbol: ?
+
+dir.create("teosinte")
+
+for (i in 1:10){
+  ##filter Chromosome "i" data in teosinte_snp based on the "Chromosome" column
+  teosinte_chr <- filter(teosinte_snp,Chromosome %in% c(i))
+  ##Sort generated files based on the "Position" column in increasing order
+  teosinte_chr_increasing <- teosinte_chr[order(teosinte_chr$Position),]
+  ##Create corresponding files based on increasing position and Chromosome "i"
+  teosinte_increasing <- paste("teosinte/teosinte_increasing_chr",i,".txt", sep="")
+  ##Export data frame to files corresponding to each Chromosome "i" and based on increasing position values
+  write.table(teosinte_chr_increasing,file= teosinte_increasing, row.names = FALSE, sep = "\t")
+  
+#Sort data for each chromosome with SNPs ordered based on decreasing position values and with missing data encoded by this symbol: -
+  
+  ##Sort teosinte_chr files based on the "Position" column in decreasing order
+  teosinte_chr_decreasing <- teosinte_chr[order(teosinte_chr$Position, decreasing = TRUE),]
+  ##Replace "?" with "-"
+  teosinte_chr_decreasing[teosinte_chr_decreasing=="?/?"] <- "-/-"
+  ##Create corresponding files based on decreasing position and Chromosome "i"
+  teosinte_decreasing <- paste("teosinte/teosinte_decreasing_chr",i,".txt", sep="")
+  ##Export data frame to files corresponding to each Chromosome "i" and based on decreasing position values
+  write.table(teosinte_chr_decreasing,file= teosinte_decreasing, row.names = FALSE, sep = "\t")
+}
+
+```
+
+Part II: Visualization
+
+```{r}
+#SNPs per chromosome
+
+
+#Missing data and amount of heterozygosity 
+
+#Own Visualization
+
+```
