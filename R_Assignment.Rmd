@@ -186,7 +186,7 @@ ggplot(dataframe_teosinte, aes(x=SNP_ID_number, y=teosinte_missing)) + geom_bar(
 
 #Own Visualization
 
-##Visualize missing at each chromosome for maize and teosinte
+##Visualize missing data at each chromosome for maize and teosinte
 
 ggplot(dataframe_maize, aes(x=Chromosome, y=maize_missing)) + geom_bar(stat = "identity") + labs(title = "Amount of Missing Data at Each Chromosome in Maize", x = "Chromosome", y = "Amount of Missing SNP Data")
 
