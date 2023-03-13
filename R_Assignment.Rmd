@@ -8,6 +8,7 @@ date: 03-13-2023
 ```{r}
 library(tidyverse)
 library(dplyr)
+library(ggplot2)
 ```
 
 Part I
@@ -125,9 +126,71 @@ Part II: Visualization
 ```{r}
 #SNPs per chromosome
 
+##Subsetting maize (Group = ZMMIL, ZMMLR and ZMMMR) and teosinte (Group = ZMPBA, ZMPIL and ZMPJA) data
+maize_teosinte <- filter(fang_et_al,Group %in% c("ZMMIL","ZMMLR","ZMMMR","ZMPBA","ZMPIL","ZMPJA"))
+maize_teosinte <- maize_teosinte[-c(1,2)]
+maize_teosinte <- t(maize_teosinte)
+maize_teosinte_snp <- merge(snp_position,maize_teosinte,by.x = "SNP_ID", by.y = "row.names")
+
+##Plot SNPs per chromosome 
+ggplot (data = maize_teosinte_snp) + geom_bar(mapping = aes(x = Chromosome, fill = Chromosome)) +xlab(label = "Chromosome") + ylab(label = "SNPs") + ggtitle("SNPs per Chromosome") + scale_x_discrete(limit=c(1:10, "unknown", "multiple"))
+###Chromosome 1 has the most SNPs, whereas chromosome 10 has the least amount of SNPs
+
+##Plot SNPs per chromosome for both maize and teosinte individually 
+###For maize:
+ggplot (data = maize_snp) + geom_bar(mapping = aes(x = Chromosome, fill = Chromosome)) +xlab(label = "Chromosome") + ylab(label = "SNPs") + ggtitle("SNPs per Chromosome for Maize") + scale_x_discrete(limit=c(1:10, "unknown", "multiple"))
+###For teosinte:
+ggplot (data = teosinte_snp) + geom_bar(mapping = aes(x = Chromosome, fill = Chromosome)) +xlab(label = "Chromosome") + ylab(label = "SNPs") + ggtitle("SNPs per Chromosome for Teosinte") + scale_x_discrete(limit=c(1:10, "unknown", "multiple"))
+####From the plots, there does not seem to be a difference between maize and tesointe in terms of amount of SNP positions found in these two genotypes
 
 #Missing data and amount of heterozygosity 
 
+##FOR MAIZE: create a data frame with eight columns: "maize_homo" for homozygosity, "maize_hetero" for heterozygosity, "maize_missing" for missing data, "maize_hetero_homo" for the ratio heterozygosity:homozygosity, "SNP_ID_number" to assign a numerical value to each SNP_ID, "SNP_ID," "Chromosome," "Position"
+maize_homo <- rowSums(maize_snp == "A/A" | maize_snp == "C/C" | maize_snp == "G/G" | maize_snp == "T/T")
+maize_hetero <- rowSums(maize_snp == "A/G" | maize_snp == "A/C" | maize_snp == "A/T" | maize_snp == "C/G" | maize_snp == "G/T" | maize_snp == "C/T")
+maize_missing <- rowSums(maize_snp == "?/?")
+maize_hetero_homo <- maize_hetero/maize_homo
+
+SNP_ID_number <- c(1:length(SNP_ID))
+SNP_ID <- maize_snp$SNP_ID
+Chromosome <- maize_snp$Chromosome
+Position <- maize_snp$Position
+
+dataframe_maize <- data.frame(SNP_ID_number, SNP_ID, Chromosome, Position, maize_homo, maize_hetero, maize_missing, maize_hetero_homo)
+
+###Plot the amount of homozgyous SNP sites for each SNP_ID
+ggplot(dataframe_maize, aes(x=SNP_ID_number, y=maize_homo)) + geom_bar(stat = "identity") + scale_x_continuous() + labs(title = "Amount of Homozygous SNP Sites in Maize", x = "SNP ID Number", y = "Amount of Homozygous SNPs")
+###Plot the amount of heterzygous SNP sites for each SNP_ID
+ggplot(dataframe_maize, aes(x=SNP_ID_number, y=maize_hetero)) + geom_bar(stat = "identity") + scale_x_continuous() + labs(title = "Amount of Heterozygous SNP Sites in Maize", x = "SNP ID Number", y = "Amount of Heterozygous SNPs")
+###Plot the proportion of heterozgyous to homozygous SNP site for each SNP_ID
+ggplot(dataframe_maize, aes(x=SNP_ID_number, y=maize_hetero_homo)) + geom_bar(stat = "identity") + scale_x_continuous() + labs(title = "Proportion of Heterzygous to Homozygous SNPs in Maize", x = "SNP ID Number", y = "Heterozygous/Homozygous SNPs")
+###Plot the amount of missing SNP data for each SNP_ID
+ggplot(dataframe_maize, aes(x=SNP_ID_number, y=maize_missing)) + geom_bar(stat = "identity") + scale_x_continuous() + labs(title = "Amount of Missing Data for SNP Sites in Maize", x = "SNP ID Number", y = "Amount of Missing SNP Data")
+
+##FOR TEOSINTE: create a data frame with eight columns: "teosinte_homo" for homozygosity, "teosinte_hetero" for heterozygosity, "teosinte_missing" for missing data, "teosinte_hetero_homo" for the ratio heterozygosity:homozygosity, "SNP_ID_number" to assign a numerical value to each SNP_ID, "SNP_ID," "Chromosome," "Position"
+teosinte_homo <- rowSums(teosinte_snp == "A/A" | teosinte_snp == "C/C" | teosinte_snp == "G/G" | teosinte_snp == "T/T")
+teosinte_hetero <- rowSums(teosinte_snp == "A/G" | teosinte_snp == "A/C" | teosinte_snp == "A/T" | teosinte_snp == "C/G" | teosinte_snp == "G/T" | teosinte_snp == "C/T")
+teosinte_missing <- rowSums(teosinte_snp == "?/?")
+teosinte_hetero_homo <- teosinte_hetero/teosinte_homo
+
+dataframe_teosinte <- data.frame(SNP_ID_number, SNP_ID, Chromosome, Position, teosinte_homo, teosinte_hetero, teosinte_missing, teosinte_hetero_homo)
+
+###Plot the amount of homozgyous SNP sites for each SNP_ID
+ggplot(dataframe_teosinte, aes(x=SNP_ID_number, y=teosinte_homo)) + geom_bar(stat = "identity") + scale_x_continuous() + labs(title = "Amount of Homozygous SNP Sites in Teosinte", x = "SNP ID Number", y = "Amount of Homozygous SNPs")
+###Plot the amount of heterzygous SNP sites for each SNP_ID
+ggplot(dataframe_teosinte, aes(x=SNP_ID_number, y=teosinte_hetero)) + geom_bar(stat = "identity") + scale_x_continuous() + labs(title = "Amount of Heterozygous SNP Sites in Teosinte", x = "SNP ID Number", y = "Amount of Heterozygous SNPs")
+###Plot the proportion of heterozgyous to homozygous SNP site for each SNP_ID
+ggplot(dataframe_teosinte, aes(x=SNP_ID_number, y=teosinte_hetero_homo)) + geom_bar(stat = "identity") + scale_x_continuous() + labs(title = "Proportion of Heterzygous to Homozygous SNPs in Teosinte", x = "SNP ID Number", y = "Heterozygous/Homozygous SNPs")
+###Plot the amount of missing SNP data for each SNP_ID
+ggplot(dataframe_teosinte, aes(x=SNP_ID_number, y=teosinte_missing)) + geom_bar(stat = "identity") + scale_x_continuous() + labs(title = "Amount of Missing Data for SNP Sites in Teosinte", x = "SNP ID Number", y = "Amount of Missing SNP Data")
+
 #Own Visualization
+
+##Visualize missing at each chromosome for maize and teosinte
+
+ggplot(dataframe_maize, aes(x=Chromosome, y=maize_missing)) + geom_bar(stat = "identity") + labs(title = "Amount of Missing Data at Each Chromosome in Maize", x = "Chromosome", y = "Amount of Missing SNP Data")
+
+ggplot(dataframe_teosinte, aes(x=Chromosome, y=teosinte_missing)) + geom_bar(stat = "identity") + labs(title = "Amount of Missing Data at Each Chromosome in Teosinte", x = "Chromosome", y = "Amount of Missing SNP Data")
+
 
 ```
