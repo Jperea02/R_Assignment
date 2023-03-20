@@ -14,9 +14,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #Part One: Running All Code
 
-Running all the code as is within your R_Assignment.Rmd gave me the following concerns:
-First, the 4 chunk of R code has a warning that appears; this warning says:
+Running all the code as is within your R_Assignment.Rmd gave me the following:
+First, the chunk 4 of R code has a warning that appears; this warning says:
 "Warning: 'maize' already exists: 'teosinte' already exists". 
+I am not sure what caused this, but it causes no issues in running the code.
 
 Second, there is an error that appears with line 154: "object 'SNP_ID' not found". This was resolved when I shifted line 155 to a line ahead of 154.
 
@@ -25,20 +26,20 @@ Code otherwise runs smoothly without issue; it can be a little slow around the '
 
 #Part Two: Other Comments
 
-Graphs:
-All of the second set of graphs (for the heterozygosity section) do not appear as useful graphs: they are dark grey squares over the graphs' axis. 
+It is possible to read in the files straight from the github repository where they are originally given to us, instead of having to read them from files in the repository. Reading from the file could cause an issue if someone only had access to the text of your code and not the additional files in your repository. 
 
-Output files:
+All of the second set of graphs (for the SNP heterozygosity section) do not appear as useful graphs: they are dark grey squares over the graphs' axis. 
+
+For the output files:
 First, the Sample ID column names are V1, V2, V3, etc. Was this intentional? 
 Second, the Position column values are ordered as if they are characters.  For example, in the file maize_decreasing_chr1 the position values are as follows:
 95,897,171
 9,300,541
 9,300,391
 88,863,284
-
 Changing the column 'Position' from a character to a numerical column might fix this.
 
 
 #Part Three: Overall
 
-All comments above require minor changes; overall your code was clean, for example the use of 'for' loops was nice in order to reduce repetitive code. Good explanation of code.
+All comments above require minor changes; overall your code was clean (easy to follow); for example the use of 'for' loops was nice in order to reduce repetitive code. Good explanation of code.
